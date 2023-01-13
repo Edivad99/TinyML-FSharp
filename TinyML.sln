@@ -7,7 +7,9 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TinyML", "TinyML\TinyML.fsp
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug Interactive|Any CPU = Debug Interactive|Any CPU
 		Debug|Any CPU = Debug|Any CPU
+		Release Interactive|Any CPU = Release Interactive|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution

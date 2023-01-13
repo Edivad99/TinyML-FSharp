@@ -3,6 +3,61 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net7.0</TargetFramework>
+		<Configurations>Debug Interactive;Release Interactive;Debug;Release</Configurations>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(RunConfiguration)' == 'Debug' ">
+		<IntermediateOutputPath>obj\Debug</IntermediateOutputPath>
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>full</DebugType>
+		<Optimize>false</Optimize>
+		<OutputPath>bin\Debug\</OutputPath>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+		<WarningLevel>5</WarningLevel>
+		<PlatformTarget>AnyCPU</PlatformTarget>
+		<Prefer32Bit>false</Prefer32Bit>
+		<StartWorkingDirectory>.</StartWorkingDirectory>
+		<ExternalConsole>true</ExternalConsole>
+		<StartArguments>test.tml</StartArguments>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(RunConfiguration)' == 'Release' ">
+		<IntermediateOutputPath>obj\Release</IntermediateOutputPath>
+		<DebugType>pdbonly</DebugType>
+		<Optimize>true</Optimize>
+		<OutputPath>bin\Release\</OutputPath>
+		<DefineConstants>TRACE</DefineConstants>
+		<WarningLevel>5</WarningLevel>
+		<PlatformTarget>AnyCPU</PlatformTarget>
+		<Prefer32Bit>false</Prefer32Bit>
+		<StartWorkingDirectory>.</StartWorkingDirectory>
+		<ExternalConsole>true</ExternalConsole>
+		<StartArguments>test.tml</StartArguments>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(RunConfiguration)' == 'Debug Interactive' ">
+		<IntermediateOutputPath>obj\Debug Interactive</IntermediateOutputPath>
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>full</DebugType>
+		<Optimize>false</Optimize>
+		<OutputPath>bin\Debug Interactive\</OutputPath>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+		<WarningLevel>5</WarningLevel>
+		<PlatformTarget>AnyCPU</PlatformTarget>
+		<Prefer32Bit>false</Prefer32Bit>
+		<StartWorkingDirectory>.</StartWorkingDirectory>
+		<ExternalConsole>true</ExternalConsole>
+		<StartArguments />
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(RunConfiguration)' == 'Release Interactive' ">
+		<IntermediateOutputPath>obj\Release Interactive</IntermediateOutputPath>
+		<DebugType>pdbonly</DebugType>
+		<Optimize>true</Optimize>
+		<OutputPath>bin\Release Interactive\</OutputPath>
+		<DefineConstants>TRACE</DefineConstants>
+		<WarningLevel>5</WarningLevel>
+		<PlatformTarget>AnyCPU</PlatformTarget>
+		<Prefer32Bit>false</Prefer32Bit>
+		<StartWorkingDirectory>.</StartWorkingDirectory>
+		<ExternalConsole>true</ExternalConsole>
+		<StartArguments />
 	</PropertyGroup>
 	<ItemGroup>
 		<Compile Include="Ast.fs" />
@@ -21,11 +76,11 @@
 		<Compile Include="Main.fs" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="FsLexYacc" Version="10.2.0">
+		<PackageReference Include="FsLexYacc" Version="11.0.1">
 			<GeneratePathProperty>
 			</GeneratePathProperty>
 		</PackageReference>
-		<PackageReference Include="FsLexYacc.Runtime" Version="10.2.0">
+		<PackageReference Include="FsLexYacc.Runtime" Version="11.0.1">
 			<GeneratePathProperty>
 			</GeneratePathProperty>
 		</PackageReference>
@@ -33,4 +88,5 @@
 	<ItemGroup>
 		<None Include="test.tml" />
 	</ItemGroup>
+	<!--<Import Project="/FsLexYacc/FsLexYacc.targets" />-->
 </Project>
