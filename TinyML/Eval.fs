@@ -60,6 +60,9 @@ let rec eval_expr (env : value env) (e : expr) : value =
 
     | _ -> unexpected_error "eval_expr: unsupported expression: %s [AST: %A]" (pretty_expr e) e
 
+// Sometimes functions are mutually recursive, meaning that calls form a circle, where one function calls
+// another which in turn calls the first, with any number of calls in between.
+// You must define such functions together in one let binding, using the and keyword to link them together.
 and binop op_int op_float env e1 e2 =
     let v1 = eval_expr env e1
     let v2 = eval_expr env e2
