@@ -28,7 +28,10 @@ let rec freevars_ty (t : ty) : tyvar Set =
     | TyTuple ts -> List.fold (fun set t -> Set.union set (freevars_ty t)) Set.empty ts 
 
 let freevars_scheme (Forall (tvs, t)) =
-    Set.difference (freevars_ty t) (Set.ofList tvs)
+    Set.difference (freevars_ty t) (tvs)
+
+let freevars_scheme_env env =
+    List.fold (fun r (_, sch) -> Set.union r (freevars_scheme sch)) Set.empty env
 
 // type inference
 //
@@ -41,9 +44,20 @@ let gamma0 = [
 
 // TODO for exam
 let rec typeinfer_expr (env : scheme env) (e : expr) : ty * subst =
-    failwith "not implemented"
+    match e with
+    | Lit (LBool _) -> TyBool, []
+    | Lit (LFloat _) -> TyFloat, [] 
+    | Lit (LString _) -> TyString, []
+    | Lit (LChar _) -> TyChar, [] 
+    | Lit LUnit -> TyUnit, []
 
-
+    | Let (x, tyo, e1, e2) -> // TODO: Devi guardare anche tyo
+        let t1, s1 = typeinfer_expr env e1
+        let tvs = freevars_ty t1 - freevars_scheme_env env
+        let sch = Forall (tvs, t1)
+        let t2, s2 = typeinfer_expr ((x, sch) :: env) e2
+        t2, compose_subst s2 s1
+    | _ -> failwithf "not implemented"
 // type checker
 //
     
