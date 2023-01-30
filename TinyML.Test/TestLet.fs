@@ -16,4 +16,4 @@ type TestLet () =
         let variable_name, ty, v = Evaluate.evaluate $"let x = {r};;"
         Assert.AreEqual("x", variable_name)
         Assert.AreEqual(t, ty)
-        Assert.AreEqual(v, r);
+        Assert.AreEqual(v, r)
