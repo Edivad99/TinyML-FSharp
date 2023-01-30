@@ -123,7 +123,7 @@ let pretty_lit lit =
     | LInt n -> sprintf "%d" n
     | LFloat n -> sprintf "%g" n
     | LString s -> sprintf "\"%s\"" s
-    | LChar c -> sprintf "%c" c
+    | LChar c -> sprintf "'%c'" c
     | LBool true -> "true"
     | LBool false -> "false"
     | LUnit -> "()"
