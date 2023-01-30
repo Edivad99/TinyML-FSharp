@@ -88,12 +88,14 @@ let rec typeinfer_expr (env : scheme env) (e : expr) : ty * subst =
     | Var x when List.exists (fun (name_variable, _) -> name_variable = x) env ->
         let _, schema = List.find (fun (name_variable, _) -> name_variable = x) env
         inst schema, []
-    | Let (x, tyo, e1, e2) -> // TODO: Devi guardare anche tyo
+    | Let (x, tyo, e1, e2) ->
         let t1, s1 = typeinfer_expr env e1
         let tvs = freevars_ty t1 - freevars_scheme_env env
         let sch = Forall (tvs, t1)
         let t2, s2 = typeinfer_expr ((x, sch) :: env) e2
-        t2, compose_subst s2 s1
+        match tyo with
+        | Some (t2_user) when t2_user <> t2 -> type_error $"the expected type of this expression is: {pretty_ty t2_user} but the actual one is: {pretty_ty t2}"
+        | _ -> t2, compose_subst s2 s1
     | _ -> failwithf "not implemented"
 
 // type checker
