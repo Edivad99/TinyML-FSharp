@@ -12,20 +12,38 @@ let type_error fmt = throw_formatted TypeError fmt
 type subst = (tyvar * ty) list
 
 // TODO implement this
-let unify (t1 : ty) (t2 : ty) : subst = []
-
-// TODO implement this
-let apply_subst (t : ty) (s : subst) : ty = t
-
-// TODO implement this
 let compose_subst (s1 : subst) (s2 : subst) : subst = s1 @ s2
+
+// TODO implement this
+let rec unify (t1 : ty) (t2 : ty) : subst =
+    match (t1, t2) with
+    | TyName s1, TyName s2 when s1 = s2 -> []
+    | TyVar tv, t
+    | t, TyVar tv -> [tv, t]
+
+    | TyArrow (t1, t2), TyArrow (t3, t4) -> compose_subst (unify t1 t3) (unify t2 t4)
+    | TyTuple ts1, TyTuple ts2 when List.length ts1 = List.length ts2 ->
+        List.fold (fun s (t1, t2) -> compose_subst s (unify t1 t2)) [] (List.zip ts1 ts2)
+
+    | _ -> type_error "cannot unify types %O and %O" t1 t2
+
+// TODO implement this
+let rec apply_subst (s : subst) (t : ty): ty =
+    match t with
+    | TyName _ -> t
+    | TyArrow (t1, t2) -> TyArrow (apply_subst s t1, apply_subst s t2)
+    | TyVar tv ->
+        try
+            let _, t1 = List.find (fun (tv1, _) -> tv1 = tv) s in t1
+        with _KeyNotFoundException -> t
+    | TyTuple ts -> TyTuple (List.map (apply_subst s) ts)
 
 let rec freevars_ty (t : ty) : tyvar Set =
     match t with
     | TyName _ -> Set.empty
     | TyArrow (t1, t2) -> Set.union (freevars_ty t1) (freevars_ty t2)
     | TyVar tv -> Set.singleton tv
-    | TyTuple ts -> List.fold (fun set t -> Set.union set (freevars_ty t)) Set.empty ts 
+    | TyTuple ts -> List.fold (fun set t -> Set.union set (freevars_ty t)) Set.empty ts
 
 let freevars_scheme (Forall (tvs, t)) =
     Set.difference (freevars_ty t) (tvs)
@@ -39,18 +57,37 @@ let freevars_scheme_env env =
 let gamma0 = [
     ("+", TyArrow (TyInt, TyArrow (TyInt, TyInt)))
     ("-", TyArrow (TyInt, TyArrow (TyInt, TyInt)))
-
 ]
+
+let mutable var_counter = 0
+
+let rec re (powerset :Set<tyvar>, t :ty) : ty =
+    match t with
+    | TyName _ -> t
+    | TyVar tv ->
+        if not (Set.contains tv powerset) then
+            t
+        else
+            var_counter <- var_counter + 1
+            TyVar (var_counter)
+    | TyArrow (t1, t2) -> TyArrow (re (powerset, t1), re (powerset, t2))
+    | TyTuple ts -> TyTuple (List.map (fun x -> re (powerset, x)) ts)
+
+let inst (Forall (tvs, t)) : ty = re (tvs, t)
 
 // TODO for exam
 let rec typeinfer_expr (env : scheme env) (e : expr) : ty * subst =
     match e with
-    | Lit (LBool _) -> TyBool, []
-    | Lit (LFloat _) -> TyFloat, [] 
+    | Lit (LInt _) -> TyInt, []
+    | Lit (LFloat _) -> TyFloat, []
     | Lit (LString _) -> TyString, []
-    | Lit (LChar _) -> TyChar, [] 
+    | Lit (LChar _) -> TyChar, []
+    | Lit (LBool _) -> TyBool, []
     | Lit LUnit -> TyUnit, []
 
+    | Var x when List.exists (fun (name_variable, _) -> name_variable = x) env ->
+        let _, schema = List.find (fun (name_variable, _) -> name_variable = x) env
+        inst schema, []
     | Let (x, tyo, e1, e2) -> // TODO: Devi guardare anche tyo
         let t1, s1 = typeinfer_expr env e1
         let tvs = freevars_ty t1 - freevars_scheme_env env
@@ -58,9 +95,8 @@ let rec typeinfer_expr (env : scheme env) (e : expr) : ty * subst =
         let t2, s2 = typeinfer_expr ((x, sch) :: env) e2
         t2, compose_subst s2 s1
     | _ -> failwithf "not implemented"
+
 // type checker
-//
-    
 let rec typecheck_expr (env : ty env) (e : expr) : ty =
     match e with
     | Lit (LInt _) -> TyInt

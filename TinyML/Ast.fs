@@ -157,8 +157,8 @@ let rec pretty_expr e =
         match e3o with
         | None -> s
         | Some e3 -> sprintf "%s else %s" s (pretty_expr e3)
-        
-    | Tuple es ->        
+
+    | Tuple es ->
         sprintf "(%s)" (pretty_tupled pretty_expr es)
 
     | BinOp (e1, op, e2) -> sprintf "%s %s %s" (pretty_expr e1) op (pretty_expr e2)

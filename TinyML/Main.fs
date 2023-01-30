@@ -14,7 +14,8 @@ let parse_from_TextReader rd filename parser = Parsing.parse_from_TextReader Syn
 let parse_from_string line filename parser = Parsing.parse_from_string SyntaxError line filename (1, 1) parser Lexer.tokenize Parser.tokenTagToTokenId
 
 let interpret_expr tenv venv e =
-    let t = Typing.typecheck_expr tenv e
+    //let t = Typing.typecheck_expr tenv e
+    let t, ts = Typing.typeinfer_expr tenv e
     let v = Eval.eval_expr venv e
     #if DEBUG
     printfn "AST:\t%A\npretty:\t%s" e (pretty_expr e)
@@ -40,7 +41,8 @@ let main_interpreter filename =
 
 let main_interactive () =
     printfn "entering interactive mode..."
-    let mutable tenv = Typing.gamma0
+    //let mutable tenv = Typing.gamma0
+    let mutable tenv = []
     let mutable venv = []
     while true do
         trap <| fun () ->
@@ -55,7 +57,9 @@ let main_interactive () =
                 | IBinding (_, x, _, _ as b) ->
                     let t, v = interpret_expr tenv venv (LetIn (b, Var x)) // TRICK: put the variable itself as body after the in
                     // update global environments
-                    tenv <- (x, t) :: tenv
+                    let tmp = Forall(Set.empty, t)
+                    tenv <- (x, tmp) :: tenv
+                    //tenv <- (x, t) :: tenv
                     venv <- (x, v) :: venv
                     x, (t, v)
 
