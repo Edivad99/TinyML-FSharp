@@ -5,6 +5,8 @@ VisualStudioVersion = 25.0.1704.2
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TinyML", "TinyML\TinyML.fsproj", "{AB97844D-6C8E-4C27-809D-8FA4D8234271}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TinyML.Test", "TinyML.Test\TinyML.Test.fsproj", "{3CCD4FFD-0B19-4028-86D1-7766C476F478}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Interactive|Any CPU = Debug Interactive|Any CPU
@@ -17,6 +19,14 @@ Global
 		{AB97844D-6C8E-4C27-809D-8FA4D8234271}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB97844D-6C8E-4C27-809D-8FA4D8234271}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB97844D-6C8E-4C27-809D-8FA4D8234271}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CCD4FFD-0B19-4028-86D1-7766C476F478}.Debug Interactive|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CCD4FFD-0B19-4028-86D1-7766C476F478}.Debug Interactive|Any CPU.Build.0 = Debug|Any CPU
+		{3CCD4FFD-0B19-4028-86D1-7766C476F478}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CCD4FFD-0B19-4028-86D1-7766C476F478}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CCD4FFD-0B19-4028-86D1-7766C476F478}.Release Interactive|Any CPU.ActiveCfg = Release|Any CPU
+		{3CCD4FFD-0B19-4028-86D1-7766C476F478}.Release Interactive|Any CPU.Build.0 = Release|Any CPU
+		{3CCD4FFD-0B19-4028-86D1-7766C476F478}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CCD4FFD-0B19-4028-86D1-7766C476F478}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
