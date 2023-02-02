@@ -7,7 +7,10 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<Compile Include="Evaluate.fs" />
+		<Compile Include="TestLit.fs" />
 		<Compile Include="TestLet.fs" />
+		<Compile Include="TestLambda.fs" />
+		<Compile Include="TestBinOp.fs" />
 		<Compile Include="Program.fs" />
 	</ItemGroup>
 	<ItemGroup>

@@ -3,7 +3,7 @@
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
-type TestLet () =
+type TestLit () =
 
     [<TestInitialize>]
     member _.TestInitialize () =
@@ -17,8 +17,8 @@ type TestLet () =
     [<DataRow("char", "'c'")>]
     [<DataRow("bool", "true")>]
     [<DataRow("unit", "()")>]
-    member _.TestGenericLet (t, r) =
-        let variable_name, ty, v = Evaluate.evaluate $"let x = {r};;"
-        Assert.AreEqual("x", variable_name)
+    member _.TestGenericLit (t, r) =
+        let variable_name, ty, v = Evaluate.evaluate $"{r};;"
+        Assert.AreEqual("it", variable_name)
         Assert.AreEqual(t, ty)
         Assert.AreEqual(r, v)

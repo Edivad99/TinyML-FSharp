@@ -85,17 +85,40 @@ let rec typeinfer_expr (env : scheme env) (e : expr) : ty * subst =
     | Lit (LBool _) -> TyBool, []
     | Lit LUnit -> TyUnit, []
 
-    | Var x when List.exists (fun (name_variable, _) -> name_variable = x) env ->
-        let _, schema = List.find (fun (name_variable, _) -> name_variable = x) env
-        inst schema, []
+    | Var x when List.exists (fun (var_name, _) -> var_name = x) env ->
+            let _, schema = List.find (fun (var_name, _) -> var_name = x) env
+            inst schema, []
+
+    | Lambda (x, tyo, e) ->
+        let temp_x = TyVar 1
+        let te, se = typeinfer_expr ((x, Forall(Set.empty, temp_x)) :: env) e
+        let t1 = apply_subst se temp_x
+        match tyo with
+        | Some (t1_user) when t1_user <> t1 -> type_error $"the expected type of this expression is {pretty_ty t1_user} but the actual one is {pretty_ty t1}"
+        | _ -> TyArrow(t1, te), se
+
     | Let (x, tyo, e1, e2) ->
         let t1, s1 = typeinfer_expr env e1
         let tvs = freevars_ty t1 - freevars_scheme_env env
         let sch = Forall (tvs, t1)
         let t2, s2 = typeinfer_expr ((x, sch) :: env) e2
         match tyo with
-        | Some (t2_user) when t2_user <> t2 -> type_error $"the expected type of this expression is: {pretty_ty t2_user} but the actual one is: {pretty_ty t2}"
+        | Some (t2_user) when t2_user <> t2 -> type_error $"the expected type of this expression is {pretty_ty t2_user} but the actual one is {pretty_ty t2}"
         | _ -> t2, compose_subst s2 s1
+
+    | BinOp (e1, ("+" | "-" | "/" | "%" | "*" as op), e2) ->
+        let t1, s1 = typeinfer_expr env e1
+        let s2 = unify t1 TyInt
+        let t1_nuovo = apply_subst s2 t1
+
+
+        let t2, s3 = typeinfer_expr env e2
+        let s4 = unify t2 TyInt
+        let t2_nuovo = apply_subst s4 t2
+
+        let res = List.fold (fun z1 z2 -> compose_subst z1 z2) [] [s1; s2; s3; s4]
+        TyInt, res
+
     | _ -> failwithf "not implemented"
 
 // type checker
@@ -113,7 +136,7 @@ let rec typecheck_expr (env : ty env) (e : expr) : ty =
         t
 
     | Lambda (x, None, e) -> unexpected_error "typecheck_expr: unannotated lambda is not supported"
-    
+
     | Lambda (x, Some t1, e) ->
         let t2 = typecheck_expr ((x, t1) :: env) e
         TyArrow (t1, t2)
