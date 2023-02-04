@@ -32,3 +32,17 @@ type TestLambda () =
         Assert.AreEqual("f", variable_name)
         Assert.AreEqual("bool -> int", ty)
         Assert.AreEqual("<|[];x;if x then 1 else -1|>", v)
+
+    [<TestMethod>]
+    member _.TestLambdaIf2Args () =
+        let variable_name, ty, v = Evaluate.evaluate $"let f x y = if true then x else y;;"
+        Assert.AreEqual("f", variable_name)
+        Assert.AreEqual("'3 -> '3 -> '3", ty)
+        Assert.AreEqual("<|[];x;fun y -> if true then x else y|>", v)
+
+    [<TestMethod>]
+    member _.TestLambdaIf2ArgsWithTuple () =
+        let variable_name, ty, v = Evaluate.evaluate $"let f x y = ((if true then x else y), x + 1);;"
+        Assert.AreEqual("f", variable_name)
+        Assert.AreEqual("int -> int -> (int, int)", ty)
+        Assert.AreEqual("<|[];x;fun y -> (if true then x else y, x + 1)|>", v)

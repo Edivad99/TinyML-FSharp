@@ -146,24 +146,24 @@ let rec typeinfer_expr (env : scheme env) (e : expr) : ty * subst =
         let s3 = compose_subst s2 s1
         let env = apply_subst_to_env s3 env
 
-
         let t2, s4 = typeinfer_expr env e2
+        let s5 = compose_subst s4 s3
 
         match e3o with
         | None ->
             if t2 <> TyUnit then
                 type_error "if-then without else requires unit type on then branch, but got %s" (pretty_ty t2)
             else
-                let s5 = compose_subst s4 s3
                 TyUnit, s5
         | Some e3 ->
-            let env = apply_subst_to_env s4 env
+            let env = apply_subst_to_env s5 env
             let t3, s6 = typeinfer_expr env e3
 
-            if t2 <> t3 then
-                type_error $"The type of all branches of an 'if' expression must be the same. The expected type of this expression is '{pretty_ty t2}', but the actual type is '{pretty_ty t3}'"
-            else
-                t3, compose_multiple_subst [s6; s4; s3; s2; s1]
+
+            let s7 = compose_subst s6 s5
+            let s8 = unify (apply_subst s7 t2) (apply_subst s7 t3)
+            let t = apply_subst s8 t2
+            t, compose_subst s8 s7
 
     | Tuple es ->
         es
