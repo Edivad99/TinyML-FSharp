@@ -4,7 +4,7 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 open TinyML
 
 [<TestClass>]
-type TestLit () =
+type TestTuple () =
 
     [<TestInitialize>]
     member _.TestInitialize () =
@@ -13,14 +13,12 @@ type TestLit () =
         Typing.reset_var_counter()
 
     [<TestMethod>]
-    [<DataRow("int", "2")>]
-    [<DataRow("float", "0.5")>]
-    [<DataRow("string", "\"ciao\"")>]
-    [<DataRow("char", "'c'")>]
-    [<DataRow("bool", "true")>]
-    [<DataRow("unit", "()")>]
-    member _.TestGenericLit (t, r) =
-        let variable_name, ty, v = Evaluate.evaluate $"{r};;"
+    [<DataRow("5", "3", "(int, int)")>]
+    [<DataRow("5", "3.1", "(int, float)")>]
+    member _.TestTuple (l: string, r: string, t: string) =
+        let variable_name, ty, v = Evaluate.evaluate $"({l},{r});;"
+
         Assert.AreEqual("it", variable_name)
         Assert.AreEqual(t, ty)
-        Assert.AreEqual(r, v)
+        Assert.AreEqual($"{l}, {r}", v)
+

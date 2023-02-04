@@ -10,6 +10,9 @@
 		<Compile Include="TestLit.fs" />
 		<Compile Include="TestLet.fs" />
 		<Compile Include="TestLambda.fs" />
+		<Compile Include="TestApp.fs" />
+		<Compile Include="TestIfThenElse.fs" />
+		<Compile Include="TestTuple.fs" />
 		<Compile Include="TestBinOp.fs" />
 		<Compile Include="Program.fs" />
 	</ItemGroup>

@@ -4,7 +4,7 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 open TinyML
 
 [<TestClass>]
-type TestLet () =
+type TestApp () =
 
     [<TestInitialize>]
     member _.TestInitialize () =
@@ -15,12 +15,10 @@ type TestLet () =
     [<TestMethod>]
     [<DataRow("int", "2")>]
     [<DataRow("float", "0.5")>]
-    [<DataRow("string", "\"ciao\"")>]
-    [<DataRow("char", "'c'")>]
-    [<DataRow("bool", "true")>]
-    [<DataRow("unit", "()")>]
-    member _.TestGenericLet (t, r) =
-        let variable_name, ty, v = Evaluate.evaluate $"let x = {r};;"
-        Assert.AreEqual("x", variable_name)
+    member _.TestIdApp (t, value) =
+        let _ = Evaluate.evaluate "let id x = x;;"
+        let variable_name, ty, v = Evaluate.evaluate $"id {value};;"
+        Assert.AreEqual("it", variable_name)
         Assert.AreEqual(t, ty)
-        Assert.AreEqual(r, v)
+        Assert.AreEqual(value, v)
+
