@@ -23,7 +23,7 @@ type TestLambda () =
     member _.TestLambdaId () =
         let variable_name, ty, v = Evaluate.evaluate $"let id x = x;;"
         Assert.AreEqual("id", variable_name)
-        Assert.AreEqual("'2 -> '2", ty)
+        Assert.AreEqual("'a -> 'a", ty)
         Assert.AreEqual("<|[];x;x|>", v)
 
     [<TestMethod>]
@@ -37,7 +37,7 @@ type TestLambda () =
     member _.TestLambdaIf2Args () =
         let variable_name, ty, v = Evaluate.evaluate $"let f x y = if true then x else y;;"
         Assert.AreEqual("f", variable_name)
-        Assert.AreEqual("'3 -> '3 -> '3", ty)
+        Assert.AreEqual("'a -> 'a -> 'a", ty)
         Assert.AreEqual("<|[];x;fun y -> if true then x else y|>", v)
 
     [<TestMethod>]
@@ -54,7 +54,7 @@ type TestLambda () =
             in (f (fun x -> x), f (fun x -> x) 1, f (fun x -> x) "ciao");;
         """
         Assert.AreEqual("it", variable_name)
-        Assert.AreEqual("('6 -> '6, int, string)", ty)
+        Assert.AreEqual("('a -> 'a, int, string)", ty)
         Assert.AreEqual("<|[x=<|[f=<|[];x;fun y -> x y|>];x;x|>];y;x y|>, 1, \"ciao\"", v)
 
     [<TestMethod>]
@@ -78,7 +78,7 @@ type TestLambda () =
             in g 5;;
         """
         Assert.AreEqual("it", variable_name)
-        Assert.AreEqual("(int, string, '3 -> '3)", ty)
+        Assert.AreEqual("(int, string, 'a -> 'a)", ty)
         Assert.AreEqual("6, \"ciao\", <|[x=5];x;x|>", v)
 
     [<TestMethod>]
@@ -92,5 +92,5 @@ type TestLambda () =
             in (f, f (-3) (fun x -> x), f (-5) (fun x -> x + 1), f);;
         """
         Assert.AreEqual("it", variable_name)
-        Assert.AreEqual("(int -> int -> '5 -> '5, int, int, int -> int -> '14 -> '14)", ty)
+        Assert.AreEqual("(int -> int -> 'a -> 'a, int, int, int -> int -> 'b -> 'b)", ty)
         Assert.AreEqual("<|[];x;fun y -> if x > 0 then y x else y x + 1|>, -2, -3, <|[];x;fun y -> if x > 0 then y x else y x + 1|>", v)

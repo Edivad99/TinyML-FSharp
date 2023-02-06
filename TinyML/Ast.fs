@@ -6,6 +6,7 @@
 module TinyML.Ast
 
 open Printf
+open System.Collections
 
 // errors
 //
@@ -111,11 +112,25 @@ let pretty_env p env = sprintf "[%s]" (flatten (fun (x, o) -> sprintf "%s=%s" x 
 // print any tuple given a printer p for its elements
 let pretty_tupled p l = flatten p "," l
 
+let mutable conversion_map = Map<int, char>[]
+
+// Range [0, 25]
+let digit_to_char number = (char) (number + 97)
+
+let get_char_to_print digit =
+    match conversion_map.TryFind digit with
+    | Some v -> v
+    | None ->
+        let size = conversion_map.Count
+        let char = digit_to_char size
+        conversion_map <- conversion_map.Add (digit, char)
+        char
+
 let rec pretty_ty t =
     match t with
     | TyName s -> s
     | TyArrow (t1, t2) -> sprintf "%s -> %s" (pretty_ty t1) (pretty_ty t2)
-    | TyVar n -> sprintf "'%d" n
+    | TyVar n -> sprintf "'%c" (get_char_to_print n)
     | TyTuple ts -> sprintf "(%s)" (pretty_tupled pretty_ty ts)
 
 let pretty_lit lit =
@@ -128,44 +143,49 @@ let pretty_lit lit =
     | LBool false -> "false"
     | LUnit -> "()"
 
-let rec pretty_expr e =
+let rec private pretty_expr_inside e =
     match e with
     | Lit lit -> pretty_lit lit
 
-    | Lambda (x, None, e) -> sprintf "fun %s -> %s" x (pretty_expr e)
-    | Lambda (x, Some t, e) -> sprintf "fun (%s : %s) -> %s" x (pretty_ty t) (pretty_expr e)
+    | Lambda (x, None, e) -> sprintf "fun %s -> %s" x (pretty_expr_inside e)
+    | Lambda (x, Some t, e) -> sprintf "fun (%s : %s) -> %s" x (pretty_ty t) (pretty_expr_inside e)
     
     // TODO pattern-match sub-application cases
-    | App (e1, e2) -> sprintf "%s %s" (pretty_expr e1) (pretty_expr e2)
+    | App (e1, e2) -> sprintf "%s %s" (pretty_expr_inside e1) (pretty_expr_inside e2)
 
     | Var x -> x
 
     | Let (x, None, e1, e2) ->
-        sprintf "let %s = %s in %s" x (pretty_expr e1) (pretty_expr e2)
+        sprintf "let %s = %s in %s" x (pretty_expr_inside e1) (pretty_expr_inside e2)
 
     | Let (x, Some t, e1, e2) ->
-        sprintf "let %s : %s = %s in %s" x (pretty_ty t) (pretty_expr e1) (pretty_expr e2)
+        sprintf "let %s : %s = %s in %s" x (pretty_ty t) (pretty_expr_inside e1) (pretty_expr_inside e2)
 
     | LetRec (x, None, e1, e2) ->
-        sprintf "let rec %s = %s in %s" x (pretty_expr e1) (pretty_expr e2)
+        sprintf "let rec %s = %s in %s" x (pretty_expr_inside e1) (pretty_expr_inside e2)
 
     | LetRec (x, Some tx, e1, e2) ->
-        sprintf "let rec %s : %s = %s in %s" x (pretty_ty tx) (pretty_expr e1) (pretty_expr e2)
+        sprintf "let rec %s : %s = %s in %s" x (pretty_ty tx) (pretty_expr_inside e1) (pretty_expr_inside e2)
 
     | IfThenElse (e1, e2, e3o) ->
-        let s = sprintf "if %s then %s" (pretty_expr e1) (pretty_expr e2)
+        let s = sprintf "if %s then %s" (pretty_expr_inside e1) (pretty_expr_inside e2)
         match e3o with
         | None -> s
-        | Some e3 -> sprintf "%s else %s" s (pretty_expr e3)
+        | Some e3 -> sprintf "%s else %s" s (pretty_expr_inside e3)
 
     | Tuple es ->
-        sprintf "(%s)" (pretty_tupled pretty_expr es)
+        sprintf "(%s)" (pretty_tupled pretty_expr_inside es)
 
-    | BinOp (e1, op, e2) -> sprintf "%s %s %s" (pretty_expr e1) op (pretty_expr e2)
+    | BinOp (e1, op, e2) -> sprintf "%s %s %s" (pretty_expr_inside e1) op (pretty_expr_inside e2)
     
-    | UnOp (op, e) -> sprintf "%s %s" op (pretty_expr e)
+    | UnOp (op, e) -> sprintf "%s %s" op (pretty_expr_inside e)
     
-    | _ -> unexpected_error "pretty_expr: %s" (pretty_expr e)
+    | _ -> unexpected_error "pretty_expr_inside: %s" (pretty_expr_inside e)
+
+let pretty_expr e =
+    let res = pretty_expr_inside e
+    conversion_map <- Map<int, char>[]
+    res
 
 let rec pretty_value v =
     match v with
@@ -173,7 +193,7 @@ let rec pretty_value v =
 
     | VTuple vs -> pretty_tupled pretty_value vs
 
-    | Closure (env, x, e) -> sprintf "<|%s;%s;%s|>" (pretty_env pretty_value env) x (pretty_expr e)
+    | Closure (env, x, e) -> sprintf "<|%s;%s;%s|>" (pretty_env pretty_value env) x (pretty_expr_inside e)
     
-    | RecClosure (env, f, x, e) -> sprintf "<|%s;%s;%s;%s|>" (pretty_env pretty_value env) f x (pretty_expr e)
-    
+    | RecClosure (env, f, x, e) -> sprintf "<|%s;%s;%s;%s|>" (pretty_env pretty_value env) f x (pretty_expr_inside e)
+

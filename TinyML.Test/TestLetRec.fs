@@ -45,7 +45,7 @@ type TestLetRec () =
                 );;
         """
         Assert.AreEqual("it", variable_name)
-        Assert.AreEqual("(int, int -> '9 -> int -> '9, int, unit, int -> string, int -> '21 -> int -> '21)", ty)
+        Assert.AreEqual("(int, int -> 'a -> int -> 'a, int, unit, int -> string, int -> 'b -> int -> 'b)", ty)
         Assert.AreEqual("<|[z=2];f;x;fun y -> x y + 1|>", v)
 
     [<TestMethod>]
@@ -62,7 +62,7 @@ type TestLetRec () =
             in (g, w, z, s, a);;
         """
         Assert.AreEqual("it", variable_name)
-        Assert.AreEqual("(int, int -> '17 -> int -> '17, int -> int, int -> string, int -> '18 -> int -> '18)", ty)
+        Assert.AreEqual("(int, int -> 'a -> int -> 'a, int -> int, int -> string, int -> 'b -> int -> 'b)", ty)
         Assert.AreEqual("<|[z=2];f;x;fun y -> x y + 1|>", v)
 
     [<TestMethod>]
