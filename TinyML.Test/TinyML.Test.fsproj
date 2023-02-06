@@ -9,6 +9,7 @@
 		<Compile Include="Evaluate.fs" />
 		<Compile Include="TestLit.fs" />
 		<Compile Include="TestLet.fs" />
+		<Compile Include="LetRec.fs" />
 		<Compile Include="TestLambda.fs" />
 		<Compile Include="TestApp.fs" />
 		<Compile Include="TestIfThenElse.fs" />

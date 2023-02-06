@@ -61,7 +61,7 @@ let freevars_scheme (Forall (tvs, t)) =
 let freevars_scheme_env env =
     List.fold (fun r (_, sch) -> Set.union r (freevars_scheme sch)) Set.empty env
 
-let generalization (env : scheme env ) (t : ty) : scheme =
+let generalization (env : scheme env) (t : ty) : scheme =
     let tvs = Set.difference (freevars_ty t) (freevars_scheme_env env)
     Forall (tvs, t)
 
@@ -138,6 +138,18 @@ let rec typeinfer_expr (env : scheme env) (e : expr) : ty * subst =
         match tyo with
         | Some (t2_user) when t2_user <> t2 -> type_error $"the expected type of this expression is {pretty_ty t2_user} but the actual one is {pretty_ty t2}"
         | _ -> t2, compose_subst s2 s1
+
+    | LetRec (f, tyo, e1, e2) ->
+        let fresh_var = fresh_variable ()
+        let t1, s1 = typeinfer_expr ((f, Forall (Set.empty, fresh_var)) :: env) e1
+        match tyo with
+        | Some (t1_user) when t1_user <> t1 -> type_error $"let rec type mismatch the expected type of this expression is {pretty_ty t1_user} but the actual one is {pretty_ty t1}"
+        | _ ->
+            let sch = generalization env t1
+
+            let local_env = apply_subst_to_env s1 env
+            let t2, s2 = typeinfer_expr ((f, sch) :: local_env) e2
+            t2, s2
 
     | IfThenElse (e1, e2, e3o) ->
         let t1, s1 = typeinfer_expr env e1
@@ -251,7 +263,7 @@ let rec typecheck_expr (env : ty env) (e : expr) : ty =
 
     | LetRec (f, None, e1, e2) ->
         unexpected_error "typecheck_expr: unannotated let rec is not supported"
-        
+
     | LetRec (f, Some tf, e1, e2) ->
         let env0 = (f, tf) :: env
         let t1 = typecheck_expr env0 e1
