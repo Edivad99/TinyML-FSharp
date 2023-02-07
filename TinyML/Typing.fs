@@ -84,7 +84,7 @@ let reset_var_counter () = var_counter <- 0
 
 let fresh_variable () =
     var_counter <- var_counter + 1
-    printfn $"New fresh variable of type {var_counter}"
+    //printfn $"New fresh variable of type {var_counter}"
     TyVar (var_counter)
 
 let inst (Forall (tvs, t)) : ty =

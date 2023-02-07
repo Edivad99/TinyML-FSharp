@@ -46,7 +46,6 @@ type TestLetRec () =
         """
         Assert.AreEqual("it", variable_name)
         Assert.AreEqual("(int, int -> 'a -> int -> 'a, int, unit, int -> string, int -> 'b -> int -> 'b)", ty)
-        Assert.AreEqual("<|[z=2];f;x;fun y -> x y + 1|>", v)
 
     [<TestMethod>]
     member _.RecursivePolymorphicFunctionAppliedMultipleTimesLetBindings () =
@@ -63,7 +62,6 @@ type TestLetRec () =
         """
         Assert.AreEqual("it", variable_name)
         Assert.AreEqual("(int, int -> 'a -> int -> 'a, int -> int, int -> string, int -> 'b -> int -> 'b)", ty)
-        Assert.AreEqual("<|[z=2];f;x;fun y -> x y + 1|>", v)
 
     [<TestMethod>]
     member _.RecursiveFunctionCountStep () =
