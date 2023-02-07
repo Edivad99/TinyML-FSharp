@@ -8,9 +8,8 @@ type TestApp () =
 
     [<TestInitialize>]
     member _.TestInitialize () =
-        Evaluate.tenv <- []
-        Evaluate.venv <- []
-        Typing.reset_var_counter()
+        Evaluate.reset_environment()
+
 
     [<TestMethod>]
     [<DataRow("int", "2")>]

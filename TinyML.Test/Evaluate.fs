@@ -5,7 +5,7 @@ open Ast
 
 module Evaluate =
 
-    let mutable tenv = []
+    let mutable tenv = Typing.gamma0_scheme_env
     let mutable venv = []
 
     let evaluate line = 
@@ -22,3 +22,7 @@ module Evaluate =
                 x, (t, v)
         x, pretty_ty t, pretty_value v
 
+    let reset_environment () =
+        tenv <- Typing.gamma0_scheme_env
+        venv <- []
+        Typing.reset_var_counter()

@@ -75,7 +75,25 @@ let apply_subst_to_env (subst : subst) (env : scheme env) : scheme env =
 let gamma0 = [
     ("+", TyArrow (TyInt, TyArrow (TyInt, TyInt)))
     ("-", TyArrow (TyInt, TyArrow (TyInt, TyInt)))
+    ("*", TyArrow (TyInt, TyArrow (TyInt, TyInt)))
+    ("/", TyArrow (TyInt, TyArrow (TyInt, TyInt)))
+    ("%", TyArrow (TyInt, TyArrow (TyInt, TyInt)))
+    ("<", TyArrow (TyInt, TyArrow (TyInt, TyBool)))
+    ("<=", TyArrow (TyInt, TyArrow (TyInt, TyBool)))
+    (">", TyArrow (TyInt, TyArrow (TyInt, TyBool)))
+    (">=", TyArrow (TyInt, TyArrow (TyInt, TyBool)))
+    ("=", TyArrow (TyInt, TyArrow (TyInt, TyBool)))
+    ("<>", TyArrow (TyInt, TyArrow (TyInt, TyBool)))
+
+    ("and", TyArrow (TyBool, TyArrow(TyBool, TyBool)))
+    ("or", TyArrow (TyBool, TyArrow(TyBool, TyBool)))
+
+    ("not", TyArrow (TyBool, TyBool))
 ]
+
+let gamma0_scheme_env =
+    gamma0
+    |> List.map (fun (name, t) -> (name, Forall (Set.empty, t)))
 
 let mutable private var_counter = 0
 
@@ -186,26 +204,11 @@ let rec typeinfer_expr (env : scheme env) (e : expr) : ty * subst =
         ) ([], [])
         |> fun (tl, s) -> TyTuple tl, s
 
-    | BinOp (e1, ("+" | "-" | "*" | "/" | "%"), e2) ->
-        let t1, s1 = typeinfer_expr env e1
-        let s2 = unify t1 TyInt
-        let env = apply_subst_to_env s2 env
+    | BinOp (e1, op, e2) when List.exists (fun (x, _) -> x = op) env ->
+        typeinfer_expr env (App (App (Var op, e1), e2))
 
-        let t2, s3 = typeinfer_expr env e2
-        let s4 = unify t2 TyInt
-
-        let res = compose_multiple_subst [s4; s3; s2; s1]
-        TyInt, res
-
-    | BinOp (e1, ("<" | "<=" | ">" | ">=" | "=" | "<>"), e2) ->
-        let t1, s1 = typeinfer_expr env e1
-        let s2 = unify t1 TyInt
-        let env = apply_subst_to_env s2 env
-
-        let t2, s3 = typeinfer_expr env e2
-        let s4 = unify t2 TyInt
-        let res = compose_multiple_subst [s4; s3; s2; s1]
-        TyBool, res
+    | UnOp (op, e) when List.exists (fun (x, _) -> x = op) env ->
+        typeinfer_expr env (App (Var op, e))
 
     | _ -> failwithf "not implemented"
 

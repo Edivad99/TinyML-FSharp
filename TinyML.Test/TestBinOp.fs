@@ -8,9 +8,7 @@ type TestBinOp () =
 
     [<TestInitialize>]
     member _.TestInitialize () =
-        Evaluate.tenv <- []
-        Evaluate.venv <- []
-        Typing.reset_var_counter()
+        Evaluate.reset_environment()
 
     [<TestMethod>]
     [<DataRow("5 + 3", "8")>]

@@ -42,7 +42,8 @@ let main_interpreter filename =
 let main_interactive () =
     printfn "entering interactive mode..."
     //let mutable tenv = Typing.gamma0
-    let mutable tenv = []
+    //let mutable tenv = []
+    let mutable tenv = Typing.gamma0_scheme_env
     let mutable venv = []
     while true do
         trap <| fun () ->

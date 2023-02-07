@@ -53,24 +53,27 @@ let rec eval_expr (env : value env) (e : expr) : value =
         | _ -> unexpected_error "eval_expr: expected closure in rec binding but got: %s" (pretty_value v1)
     // TODO: implement other binary ops
     | Tuple es -> VTuple (List.map (fun e -> eval_expr env e) es)
-    | BinOp (e1, "+", e2) -> binop (+) (+) env e1 e2
-    | BinOp (e1, "-", e2) -> binop (-) (-) env e1 e2
-    | BinOp (e1, "*", e2) -> binop ( * ) ( * ) env e1 e2
-    | BinOp (e1, "/", e2) -> binop (/) (/) env e1 e2
-    | BinOp (e1, "%", e2) -> binop (%) (%) env e1 e2
-    | BinOp (e1, ">", e2) -> boolop (>) (>) env e1 e2
-    | BinOp (e1, ">=", e2) -> boolop (>=) (>=) env e1 e2
-    | BinOp (e1, "<", e2) -> boolop (<) (<) env e1 e2
-    | BinOp (e1, "<=", e2) -> boolop (<=) (<=) env e1 e2
-    | BinOp (e1, "=", e2) -> boolop_equal (=) env e1 e2
-    | BinOp (e1, "<>", e2) -> boolop_equal (<>) env e1 e2
+    | BinOp (e1, "+", e2) -> arithmetic_op(+) (+) env e1 e2
+    | BinOp (e1, "-", e2) -> arithmetic_op (-) (-) env e1 e2
+    | BinOp (e1, "*", e2) -> arithmetic_op ( * ) ( * ) env e1 e2
+    | BinOp (e1, "/", e2) -> arithmetic_op (/) (/) env e1 e2
+    | BinOp (e1, "%", e2) -> arithmetic_op (%) (%) env e1 e2
+    | BinOp (e1, ">", e2) -> bool_op_num (>) (>) env e1 e2
+    | BinOp (e1, ">=", e2) -> bool_op_num (>=) (>=) env e1 e2
+    | BinOp (e1, "<", e2) -> bool_op_num (<) (<) env e1 e2
+    | BinOp (e1, "<=", e2) -> bool_op_num (<=) (<=) env e1 e2
+    | BinOp (e1, "=", e2) -> bool_op_equal_num (=) env e1 e2
+    | BinOp (e1, "<>", e2) -> bool_op_equal_num (<>) env e1 e2
+    | BinOp (e1, "and", e2) -> bool_op (&&) env e1 e2
+    | BinOp (e1, "or", e2) -> bool_op (||) env e1 e2
+    | UnOp ("not", e) -> un_op_not (not) env e
 
     | _ -> unexpected_error "eval_expr: unsupported expression: %s [AST: %A]" (pretty_expr e) e
 
 // Sometimes functions are mutually recursive, meaning that calls form a circle, where one function calls
 // another which in turn calls the first, with any number of calls in between.
 // You must define such functions together in one let binding, using the and keyword to link them together.
-and binop op_int op_float env e1 e2 =
+and arithmetic_op op_int op_float env e1 e2 =
     let v1 = eval_expr env e1
     let v2 = eval_expr env e2
     match v1, v2 with
@@ -80,7 +83,7 @@ and binop op_int op_float env e1 e2 =
     | VLit (LFloat x), VLit (LInt y) -> VLit (LFloat (op_float x (float y)))
     | _ -> unexpected_error "eval_expr: illegal operands in binary operator (+): %s + %s" (pretty_value v1) (pretty_value v2)
 
-and boolop op_int op_float env e1 e2 =
+and bool_op_num op_int op_float env e1 e2 =
     let v1 = eval_expr env e1
     let v2 = eval_expr env e2
     match v1, v2 with
@@ -90,9 +93,22 @@ and boolop op_int op_float env e1 e2 =
     | VLit (LFloat x), VLit (LInt y) -> VLit (LBool (op_float x (float y)))
     | _ -> unexpected_error $"eval_expr: illegal operands in binary operator (+): {pretty_value v1} + {pretty_value v2}"
 
-and boolop_equal op env e1 e2 =
+and bool_op_equal_num op env e1 e2 =
     let v1 = eval_expr env e1
     let v2 = eval_expr env e2
     match v1, v2 with
     | VLit (LInt x), VLit (LInt y) -> VLit (LBool (op x y))
-    | _ -> unexpected_error $"eval_expr: The equal operator works only on int"
+    | _ -> unexpected_error $"eval_expr: The =/<> operator works only on int"
+
+and bool_op op env e1 e2 =
+    let v1 = eval_expr env e1
+    let v2 = eval_expr env e2
+    match v1, v2 with
+    | VLit (LBool x), VLit (LBool y) -> VLit (LBool (op x y))
+    | _ -> unexpected_error $"eval_expr: The and/or operator works only on bool"
+
+and un_op_not op env e =
+    let v = eval_expr env e
+    match v with
+    | VLit (LBool x) -> VLit (LBool (op x))
+    | _ -> unexpected_error "eval_expr: The not operator works only on bool"
