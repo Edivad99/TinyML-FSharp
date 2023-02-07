@@ -1,7 +1,6 @@
 ﻿namespace TinyML.Test
 
 open Microsoft.VisualStudio.TestTools.UnitTesting
-open TinyML
 
 [<TestClass>]
 type TestBinOp () =
@@ -33,6 +32,10 @@ type TestBinOp () =
     [<DataRow("5 = 5", "true")>]
     [<DataRow("5 <> 3", "true")>]
     [<DataRow("5 <> 5", "false")>]
+    [<DataRow("false or false", "false")>]
+    [<DataRow("false and false", "false")>]
+    [<DataRow("true or false", "true")>]
+    [<DataRow("true and false", "false")>]
     member _.TestBoolBinOp (expr: string, result) =
         let variable_name, ty, v = Evaluate.evaluate $"{expr};;"
         Assert.AreEqual("it", variable_name)

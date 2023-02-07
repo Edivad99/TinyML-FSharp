@@ -1,7 +1,6 @@
 ﻿namespace TinyML.Test
 
 open Microsoft.VisualStudio.TestTools.UnitTesting
-open TinyML
 
 [<TestClass>]
 type TestTuple () =
@@ -20,4 +19,3 @@ type TestTuple () =
         Assert.AreEqual("it", variable_name)
         Assert.AreEqual(t, ty)
         Assert.AreEqual($"{l}, {r}", v)
-

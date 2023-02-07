@@ -1,7 +1,6 @@
 ﻿namespace TinyML.Test
 
 open Microsoft.VisualStudio.TestTools.UnitTesting
-open TinyML
 
 [<TestClass>]
 type TestLetRec () =
@@ -45,6 +44,12 @@ type TestLetRec () =
         """
         Assert.AreEqual("it", variable_name)
         Assert.AreEqual("(int, int -> 'a -> int -> 'a, int, unit, int -> string, int -> 'b -> int -> 'b)", ty)
+
+    [<TestMethod>]
+    member _.RecursiveFunctionWithOneParameter () =
+        let variable_name, ty, v = Evaluate.evaluate "let rec f (x : int) = f 1;;"
+        Assert.AreEqual("f", variable_name)
+        Assert.AreEqual("int -> 'a", ty)
 
     [<TestMethod>]
     member _.RecursivePolymorphicFunctionAppliedMultipleTimesLetBindings () =

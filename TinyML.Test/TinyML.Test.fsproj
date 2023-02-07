@@ -15,6 +15,7 @@
 		<Compile Include="TestIfThenElse.fs" />
 		<Compile Include="TestTuple.fs" />
 		<Compile Include="TestBinOp.fs" />
+		<Compile Include="TestUnOp.fs" />
 		<Compile Include="Program.fs" />
 	</ItemGroup>
 	<ItemGroup>

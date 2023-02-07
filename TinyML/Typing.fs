@@ -131,11 +131,16 @@ let rec typeinfer_expr (env : scheme env) (e : expr) : ty * subst =
 
     | Lambda (x, tyo, e) ->
         let fresh_var = fresh_variable ()
-        let te, se = typeinfer_expr ((x, Forall(Set.empty, fresh_var)) :: env) e
-        let t1 = apply_subst se fresh_var
-        match tyo with
-        | Some (t1_user) when t1_user <> t1 -> type_error $"the expected type of this expression is {pretty_ty t1_user} but the actual one is {pretty_ty t1}"
-        | _ -> TyArrow(t1, te), se
+        let te, s1 = typeinfer_expr ((x, Forall(Set.empty, fresh_var)) :: env) e
+        let t1 = apply_subst s1 fresh_var
+
+        let unify_with_user_type =
+            match tyo with
+            | Some t -> unify t1 t
+            | None -> []
+
+        let t2 = apply_subst unify_with_user_type t1
+        TyArrow (t2, te), compose_subst unify_with_user_type s1
 
     | App (e1, e2) ->
         let t1, s1 = typeinfer_expr env e1

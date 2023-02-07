@@ -1,7 +1,6 @@
 ﻿namespace TinyML.Test
 
 open Microsoft.VisualStudio.TestTools.UnitTesting
-open TinyML
 
 [<TestClass>]
 type TestLet () =
