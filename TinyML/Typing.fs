@@ -187,7 +187,7 @@ let rec typeinfer_expr (env : scheme env) (e : expr) : ty * subst =
         match e3o with
         | None ->
             if t2 <> TyUnit then
-                type_error "if-then without else requires unit type on then branch, but got %s" (pretty_ty t2)
+                type_error $"if-then without else requires unit type on then branch, but got {pretty_ty t2}"
             else
                 TyUnit, s5
         | Some e3 ->

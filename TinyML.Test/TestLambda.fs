@@ -58,11 +58,9 @@ type TestLambda () =
     [<TestMethod>]
     member _.TestLambdaHighOrderWhichReceivesPolymorphicFunction () =
         let variable_name, ty, v = Evaluate.evaluate $"""
-            let f = fun x -> 
-                fun y ->
-                    if x > 0
-                    then y x
-                    else y (x + 1)
+            let f x y = 
+                if x > 0 then y x
+                else y (x + 1)
             in f 5 (fun x -> x);;
         """
         Assert.AreEqual("it", variable_name)
@@ -72,7 +70,7 @@ type TestLambda () =
     [<TestMethod>]
     member _.TestLambdaReturningClusureArgsShadowed () =
         let variable_name, ty, v = Evaluate.evaluate $"""
-            let g = fun x -> ( x + 1, let x = "ciao" in x , fun x -> x )
+            let g x = ( x + 1, let x = "ciao" in x , fun x -> x )
             in g 5;;
         """
         Assert.AreEqual("it", variable_name)
@@ -82,11 +80,9 @@ type TestLambda () =
     [<TestMethod>]
     member _.PolymorphicHighOrderFunctionMoreTimesTuple () =
         let variable_name, ty, v = Evaluate.evaluate $"""
-            let f = fun x ->
-                fun y ->
-                    if x > 0
-                    then y x
-                    else y (x + 1)
+            let f x y =
+                if x > 0 then y x
+                else y (x + 1)
             in (f, f (-3) (fun x -> x), f (-5) (fun x -> x + 1), f);;
         """
         Assert.AreEqual("it", variable_name)

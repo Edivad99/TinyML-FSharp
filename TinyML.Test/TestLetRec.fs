@@ -29,7 +29,7 @@ type TestLetRec () =
         Assert.AreEqual("<|[];fib;x;if x < 3 then 1 else fib x - 1 + fib x - 2|>", v)
 
     [<TestMethod>]
-    member _.RecursivePolymorphicFunctionAppliedMultipleOnATuple2 () =
+    member _.RecursivePolymorphicFunctionAppliedMultipleOnATuple () =
         let variable_name, ty, v = Evaluate.evaluate $"""
             let z = 2 in
             let rec f x y = x (y + 1)
